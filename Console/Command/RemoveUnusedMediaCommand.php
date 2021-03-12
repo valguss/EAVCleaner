@@ -71,6 +71,10 @@ class RemoveUnusedMediaCommand extends Command
 
         $directoryIterator = new \RecursiveDirectoryIterator($imageDir);
 
+        $imagesToKeep = $connection->fetchAll(
+            'SELECT value FROM ' . $mediaGalleryTable
+        );
+
         foreach (new \RecursiveIteratorIterator($directoryIterator) as $file) {
 
             // Cached path guard
@@ -89,10 +93,7 @@ class RemoveUnusedMediaCommand extends Command
                 continue;
             }
 
-            $imageFound = $connection->fetchOne(
-                'SELECT value FROM ' . $mediaGalleryTable . ' WHERE value = ?', array($filePath)
-            );
-            if ($imageFound) {
+            if (in_array($filePath, $imagesToKeep)) {
                 continue;
             }
 
